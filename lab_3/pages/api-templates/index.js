@@ -9,6 +9,7 @@ export class ApiTemplatesPage {
         this.data = this.getData()
     }
 
+    
     getData() {
         const products = [
             {
