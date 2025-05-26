@@ -90,7 +90,7 @@ export class AddPage {
         homeButton.render(this.clickBack.bind(this))
 
         const form = document.getElementById('add-form')
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault()
             
             const newCard = {
@@ -114,15 +114,18 @@ export class AddPage {
                 ]
             }
 
-            ajax.post(bankproductsUrls.createTemplate(), newCard, (data, status) => {
-                if (status === 201) {
+            try {
+                const result = await ajax.post(bankproductsUrls.createTemplate(), newCard);
+                if (result.status === 201) {
                     // В случае успеха возвращаемся на главную страницу
-                    this.clickBack()
+                    this.clickBack();
                 } else {
-                    console.error('Ошибка создания карточки:', status, data)
+                    console.error('Ошибка создания карточки:', result.status);
                     // Здесь можно добавить отображение ошибки пользователю
                 }
-            })
+            } catch (error) {
+                console.error('Ошибка при создании карточки:', error);
+            }
         })
     }
 } 

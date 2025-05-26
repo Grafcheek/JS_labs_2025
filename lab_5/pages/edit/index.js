@@ -94,24 +94,28 @@ export class EditPage {
         mainPage.render()
     }
 
-    loadCardData() {
-        ajax.get(bankproductsUrls.getTemplateById(this.cardId), (data, status) => {
-            if (status === 200 && data) {
+    async loadCardData() {
+        try {
+            const result = await ajax.get(bankproductsUrls.getTemplateById(this.cardId));
+            if (result.status === 200 && result.data) {
                 // Заполняем форму данными карточки
-                document.getElementById('title').value = data.title
+                document.getElementById('title').value = result.data.title;
                 
-                data.elements.forEach((element, index) => {
-                    const num = index + 1
-                    document.getElementById(`element${num}-title`).value = element.title
-                    document.getElementById(`element${num}-description`).value = element.description
-                    document.getElementById(`element${num}-src`).value = element.src
-                    document.getElementById(`element${num}-comment`).value = element.comments || ''
-                })
+                result.data.elements.forEach((element, index) => {
+                    const num = index + 1;
+                    document.getElementById(`element${num}-title`).value = element.title;
+                    document.getElementById(`element${num}-description`).value = element.description;
+                    document.getElementById(`element${num}-src`).value = element.src;
+                    document.getElementById(`element${num}-comment`).value = element.comments || '';
+                });
             } else {
-                console.error('Ошибка загрузки данных карточки:', status, data)
-                this.clickBack()
+                console.error('Ошибка загрузки данных карточки:', result.status);
+                this.clickBack();
             }
-        })
+        } catch (error) {
+            console.error('Ошибка при загрузке данных карточки:', error);
+            this.clickBack();
+        }
     }
 
     render() {
@@ -126,7 +130,7 @@ export class EditPage {
         this.loadCardData()
 
         const form = document.getElementById('edit-form')
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault()
             
             const updatedCard = {
@@ -154,15 +158,18 @@ export class EditPage {
                 ]
             }
 
-            ajax.put(bankproductsUrls.updateTemplate(this.cardId), updatedCard, (data, status) => {
-                if (status === 200) {
+            try {
+                const result = await ajax.put(bankproductsUrls.updateTemplate(this.cardId), updatedCard);
+                if (result.status === 200) {
                     // В случае успеха возвращаемся на главную страницу
-                    this.clickBack()
+                    this.clickBack();
                 } else {
-                    console.error('Ошибка обновления карточки:', status, data)
+                    console.error('Ошибка обновления карточки:', result.status);
                     // Здесь можно добавить отображение ошибки пользователю
                 }
-            })
+            } catch (error) {
+                console.error('Ошибка при обновлении карточки:', error);
+            }
         })
     }
 } 

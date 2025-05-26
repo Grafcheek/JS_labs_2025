@@ -1,73 +1,69 @@
 class Ajax {
-    get(url, callback) {
-        console.log('GET request to:', url)
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', url);
-        xhr.send();
-
-        xhr.onreadystatechange = () => {
-            console.log('GET readyState:', xhr.readyState)
-            if (xhr.readyState === 4) {
-                this._handleResponse(xhr, callback);
-            }
-        };
-    }
-
-    post(url, data, callback) {
-        console.log('POST request to:', url)
-        console.log('POST data:', data)
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', url);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(data));
-
-        xhr.onreadystatechange = () => {
-            console.log('POST readyState:', xhr.readyState)
-            if (xhr.readyState === 4) {
-                this._handleResponse(xhr, callback);
-            }
-        };
-    }
-
-    put(url, data, callback) {
-        console.log('PUT request to:', url)
-        console.log('PUT data:', data)
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', url);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(data));
-
-        xhr.onreadystatechange = () => {
-            console.log('PUT readyState:', xhr.readyState)
-            if (xhr.readyState === 4) {
-                this._handleResponse(xhr, callback);
-            }
-        };
-    }
-
-    delete(url, callback) {
-        console.log('DELETE request to:', url)
-        const xhr = new XMLHttpRequest();
-        xhr.open('DELETE', url);
-        xhr.send();
-
-        xhr.onreadystatechange = () => {
-            console.log('DELETE readyState:', xhr.readyState)
-            if (xhr.readyState === 4) {
-                this._handleResponse(xhr, callback);
-            }
-        };
-    }
-
-    _handleResponse(xhr, callback) {
+    async get(url) {
+        console.log('GET request to:', url);
         try {
-            console.log('Response status:', xhr.status)
-            console.log('Response text:', xhr.responseText)
-            const data = xhr.responseText ? JSON.parse(xhr.responseText) : null;
-            callback(data, xhr.status);
-        } catch (e) {
-            console.error('Ошибка парсинга JSON:', e);
-            callback(null, xhr.status);
+            const response = await fetch(url);
+            const data = await response.json();
+            console.log('GET response:', data);
+            return { data, status: response.status };
+        } catch (error) {
+            console.error('GET error:', error);
+            throw error;
+        }
+    }
+
+    async post(url, data) {
+        console.log('POST request to:', url);
+        console.log('POST data:', data);
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const responseData = await response.json();
+            console.log('POST response:', responseData);
+            return { data: responseData, status: response.status };
+        } catch (error) {
+            console.error('POST error:', error);
+            throw error;
+        }
+    }
+
+    async put(url, data) {
+        console.log('PUT request to:', url);
+        console.log('PUT data:', data);
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const responseData = await response.json();
+            console.log('PUT response:', responseData);
+            return { data: responseData, status: response.status };
+        } catch (error) {
+            console.error('PUT error:', error);
+            throw error;
+        }
+    }
+
+    async delete(url) {
+        console.log('DELETE request to:', url);
+        try {
+            const response = await fetch(url, {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            console.log('DELETE response:', data);
+            return { data, status: response.status };
+        } catch (error) {
+            console.error('DELETE error:', error);
+            throw error;
         }
     }
 }

@@ -11,18 +11,26 @@ import { bankproductsUrls } from '../../modules/bankproductsUrls.js'
 export class MainPage {
     constructor(parent) {
         this.parent = parent
+        this.data = []
         this.handleSearch = this.handleSearch.bind(this)
     }
 
-    getData() {
-        ajax.get(bankproductsUrls.getTemplates(), (data, status) => {
-            if (status === 200 && data) {
-                this.renderCards(data, true)
+    async getData() {
+        try {
+            const result = await ajax.get(bankproductsUrls.getTemplates());
+            if (result.status === 200 && result.data) {
+                this.data = result.data;
+                this.renderCards(this.data, true);
             } else {
-                console.error('Ошибка получения данных:', status)
-                this.renderCards([], true)
+                console.error('Ошибка получения данных:', result.status);
+                this.data = [];
+                this.renderCards(this.data, true);
             }
-        })
+        } catch (error) {
+            console.error('Ошибка при получении данных:', error);
+            this.data = [];
+            this.renderCards(this.data, true);
+        }
     }
 
     get pageRoot() {
@@ -44,18 +52,22 @@ export class MainPage {
         `
     }
 
-    handleSearch(searchTerm) {
-        if (searchTerm) {
-            ajax.get(bankproductsUrls.getTemplatesWithSearch(searchTerm), (data, status) => {
-                if (status === 200 && data) {
-                    this.renderCards(data, false)
+    async handleSearch(searchTerm) {
+        try {
+            if (searchTerm) {
+                const result = await ajax.get(bankproductsUrls.getTemplatesWithSearch(searchTerm));
+                if (result.status === 200 && result.data) {
+                    this.renderCards(result.data, false);
                 } else {
-                    console.error('Ошибка получения данных при поиске:', status)
-                    this.renderCards([], false)
+                    console.error('Ошибка получения данных при поиске:', result.status);
+                    this.renderCards([], false);
                 }
-            })
-        } else {
-            this.getData()
+            } else {
+                await this.getData();
+            }
+        } catch (error) {
+            console.error('Ошибка при поиске:', error);
+            this.renderCards([], false);
         }
     }
 
@@ -86,14 +98,18 @@ export class MainPage {
         addPage.render()
     }
 
-    handleRemoveCard(cardId) {
-        ajax.delete(bankproductsUrls.deleteTemplate(cardId), (data, status) => {
-            if (status === 200) {
-                this.getData() // Обновляем данные после удаления
+    async handleRemoveCard(cardId) {
+        try {
+            const result = await ajax.delete(bankproductsUrls.deleteTemplate(cardId));
+            if (result.status === 200) {
+                this.data = this.data.filter(item => item.id !== cardId);
+                this.renderCards(this.data, true);
             } else {
-                console.error('Ошибка удаления карточки:', status)
+                console.error('Ошибка удаления карточки:', result.status);
             }
-        })
+        } catch (error) {
+            console.error('Ошибка при удалении карточки:', error);
+        }
     }
 
     render() {
