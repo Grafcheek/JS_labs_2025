@@ -1,36 +1,40 @@
-const express = require('express');
-const { setupBankRoutes } = require('../../internal/controller/bank_controller');
-const { BankProductRepository } = require('../../internal/repository/bank_repository');
-const { BankProductService } = require('../../internal/service/bank_service');
+const express = require('express')
+const path = require('path')
 
-const app = express();
-const PORT = 8000;
-const HOST = 'localhost';
+const { SetupRoutes } = require('../../internal/controller/controller')
+const { DBConnector } = require('../../internal/db/db')
+const { Repository } = require('../../internal/repository/repository')
+const { Service } = require('../../internal/service/service')
+const app = express()
+const host = 'localhost'
+const port = 8000
 
-
-app.use(express.json());
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+const corsMiddleware = (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:8000');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    
     next();
-});
+};
 
+app.use(corsMiddleware)
+app.use(express.json())
+app.use(express.static(path.join(__dirname, '../../public')))
 
-const repository = new BankProductRepository();
-const service = new BankProductService(repository);
-const router = setupBankRoutes(service);
+db=new DBConnector("bank_products.json")
 
+repo=new Repository(db)
 
-app.use('/api/bank-products', router);
+service=new Service(repo)
 
+router=SetupRoutes(service)
 
-app.use((err, req, res, next) => {
-    console.error('[ERROR]', err);
-    res.status(500).json({ error: 'Internal server error' });
-});
+app.use('/bank-products', router)
 
-
-app.listen(PORT, HOST, () => {
-    console.log(`Raiffeisen Bank API запущен на http://${HOST}:${PORT}`);
-});
+app.listen(port, host, () => {
+	console.log(`Raiffeisen Bank API запущен на http://${host}:${port}`)
+})
