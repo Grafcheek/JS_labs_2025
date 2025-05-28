@@ -5,9 +5,9 @@ export class AddCardButtonComponent {
 
     getHTML() {
         return `
-    <div class="templates-card">
-        <div class="card-body-custom">
-            <button id="add-card-button" type="button" style="color:#2B2D33; font-size:200px; border:none; min-width:400px;min-height:312px;">+</button>
+    <div class="templates-card" style="width: 340px; height: 400px; display: flex; align-items: center; justify-content: center;">
+        <div class="card-body-custom" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <button id="add-card-button" type="button" style="color:#2B2D33; font-size:120px; border:none; background: #F5F6F7; border-radius: 50%; width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); line-height: 1; padding: 0; text-align: center;">+</button>
         </div>
     </div>`
     }

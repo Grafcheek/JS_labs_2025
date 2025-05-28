@@ -5,31 +5,32 @@ import { HomeButtonComponent } from '../../components/home-button/index.js'
 import { SearchFilterComponent } from '../../components/filter/index.js'
 import { AddPage } from '../add/index.js'
 import { EditPage } from '../edit/index.js'
+import { ViewPage } from '../view/index.js'
 import { ajax } from '../../modules/ajax.js'
 import { bankproductsUrls } from '../../modules/bankproductsUrls.js'
 
 export class MainPage {
     constructor(parent) {
         this.parent = parent
-        this.data = []
+        this.data = [] // Добавляем хранение данных
         this.handleSearch = this.handleSearch.bind(this)
     }
 
     async getData() {
         try {
-            const result = await ajax.get(bankproductsUrls.getTemplates());
+            const result = await ajax.get(bankproductsUrls.getTemplates())
             if (result.status === 200 && result.data) {
-                this.data = result.data;
-                this.renderCards(this.data, true);
+                this.data = result.data // Сохраняем данные
+                this.renderCards(this.data, true)
             } else {
-                console.error('Ошибка получения данных:', result.status);
-                this.data = [];
-                this.renderCards(this.data, true);
+                console.error('Ошибка получения данных:', result.status)
+                this.data = []
+                this.renderCards(this.data, true)
             }
         } catch (error) {
-            console.error('Ошибка при получении данных:', error);
-            this.data = [];
-            this.renderCards(this.data, true);
+            console.error('Ошибка получения данных:', error)
+            this.data = []
+            this.renderCards(this.data, true)
         }
     }
 
@@ -55,19 +56,19 @@ export class MainPage {
     async handleSearch(searchTerm) {
         try {
             if (searchTerm) {
-                const result = await ajax.get(bankproductsUrls.getTemplatesWithSearch(searchTerm));
+                const result = await ajax.get(bankproductsUrls.getTemplatesWithSearch(searchTerm))
                 if (result.status === 200 && result.data) {
-                    this.renderCards(result.data, false);
+                    this.renderCards(result.data, false)
                 } else {
-                    console.error('Ошибка получения данных при поиске:', result.status);
-                    this.renderCards([], false);
+                    console.error('Ошибка получения данных при поиске:', result.status)
+                    this.renderCards([], false)
                 }
             } else {
-                await this.getData();
+                await this.getData()
             }
         } catch (error) {
-            console.error('Ошибка при поиске:', error);
-            this.renderCards([], false);
+            console.error('Ошибка при поиске:', error)
+            this.renderCards([], false)
         }
     }
 
@@ -77,7 +78,8 @@ export class MainPage {
             const card = new BankProductsCardComponent(this.pageRoot)
             card.render(
                 item,
-                () => this.clickCard(item.id),
+                () => this.handleViewCard(item.id),
+                () => this.handleEditCard(item.id),
                 () => this.handleRemoveCard(item.id)
             )
         })
@@ -88,7 +90,12 @@ export class MainPage {
         }
     }
 
-    clickCard(cardId) {
+    handleViewCard(cardId) {
+        const viewPage = new ViewPage(this.parent, cardId)
+        viewPage.render()
+    }
+
+    handleEditCard(cardId) {
         const editPage = new EditPage(this.parent, cardId)
         editPage.render()
     }
@@ -100,15 +107,16 @@ export class MainPage {
 
     async handleRemoveCard(cardId) {
         try {
-            const result = await ajax.delete(bankproductsUrls.deleteTemplate(cardId));
+            const result = await ajax.delete(bankproductsUrls.deleteTemplate(cardId))
             if (result.status === 200) {
-                this.data = this.data.filter(item => item.id !== cardId);
-                this.renderCards(this.data, true);
+                // Обновляем локальные данные вместо повторного запроса
+                this.data = this.data.filter(item => item.id !== cardId)
+                this.renderCards(this.data, true)
             } else {
-                console.error('Ошибка удаления карточки:', result.status);
+                console.error('Ошибка удаления карточки:', result.status)
             }
         } catch (error) {
-            console.error('Ошибка при удалении карточки:', error);
+            console.error('Ошибка удаления карточки:', error)
         }
     }
 
