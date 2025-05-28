@@ -3,7 +3,9 @@ class BankProductDTO {
 	  BankProductDTO._validate(data);
 	  this.id = data.id || null;
 	  this.title = data.title;
-	  this.elements = data.elements;
+	  this.description = data.description;
+	  this.src = data.src;
+	  this.comments = data.comments || "";
 	}
   
 	static _validate(data) {
@@ -18,8 +20,12 @@ class BankProductDTO {
 		throw new Error('Title is required');
 	  }
   
-	  if (!Array.isArray(data.elements)) {
-		throw new Error('Elements must be an array');
+	  if (!data.description || typeof data.description !== 'string') {
+		throw new Error('Description is required');
+	  }
+
+	  if (!data.src || typeof data.src !== 'string') {
+		throw new Error('Image source is required');
 	  }
 	}
   
@@ -27,7 +33,9 @@ class BankProductDTO {
 	  return {
 		id: this.id,
 		title: this.title,
-		elements: this.elements,
+		description: this.description,
+		src: this.src,
+		comments: this.comments
 	  };
 	}
   }
