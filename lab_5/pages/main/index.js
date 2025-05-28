@@ -5,6 +5,7 @@ import { HomeButtonComponent } from '../../components/home-button/index.js'
 import { SearchFilterComponent } from '../../components/filter/index.js'
 import { AddPage } from '../add/index.js'
 import { EditPage } from '../edit/index.js'
+import { ViewPage } from '../view/index.js'
 import { ajax } from '../../modules/ajax.js'
 import { bankproductsUrls } from '../../modules/bankproductsUrls.js'
 
@@ -31,17 +32,7 @@ export class MainPage {
 
     getHTML() {
         return `
-        <header class="navbar navbar-expand-lg navbar-dark bg-white sticky-top">
-                <div class="container-fluid">
-                    <div id="home-button-container"></div>
-                </div>
-            </header>
-
-        <!-- Добавляем контейнер для фильтра -->
-        <div id="search-filter-container"></div>
-        
-        <div id="main-page" class="d-flex flex-wrap gap-3 p-3" style="background-color:rgb(255, 255, 255);"></div>
-        `
+        <header class=\"navbar navbar-expand-lg navbar-dark bg-white sticky-top\">\n                <div class=\"container-fluid\">\n                    <div id=\"home-button-container\"></div>\n                </div>\n            </header>\n\n        <!-- Добавляем контейнер для фильтра -->\n        <div id=\"search-filter-container\"></div>\n        \n        <div id=\"main-page\" class=\"d-flex flex-wrap gap-3 p-3\" style=\"background-color:#F8F6F2; min-height: 100vh;\"></div>\n        `
     }
 
     handleSearch(searchTerm) {
@@ -65,7 +56,8 @@ export class MainPage {
             const card = new BankProductsCardComponent(this.pageRoot)
             card.render(
                 item,
-                () => this.clickCard(item.id),
+                () => this.handleViewCard(item.id),
+                () => this.handleEditCard(item.id),
                 () => this.handleRemoveCard(item.id)
             )
         })
@@ -76,7 +68,12 @@ export class MainPage {
         }
     }
 
-    clickCard(cardId) {
+    handleViewCard(cardId) {
+        const viewPage = new ViewPage(this.parent, cardId)
+        viewPage.render()
+    }
+
+    handleEditCard(cardId) {
         const editPage = new EditPage(this.parent, cardId)
         editPage.render()
     }

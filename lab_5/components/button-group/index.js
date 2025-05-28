@@ -5,7 +5,7 @@ export class ButtonGroupComponent {
 
 	getHTML(data) {
 		return `
-      <div class="btn-group mt-3" role="group" aria-label="Действия с карточкой">
+      <div class="btn-group mt-3" role="group" aria-label="Действия с карточкой" style="display: flex; gap: 12px; align-items: center; justify-content: flex-start;">
 				<button type="button" 
                 class="btn" 
                 id="remove-${data.id}"
@@ -38,40 +38,65 @@ export class ButtonGroupComponent {
                     cursor: pointer;
                     transition: background-color 0.2s ease;
                 ">
-            <i class="bi bi-calculator"></i> Просмотр
+            <i class="bi bi-eye"></i> Просмотр
+        </button>
+        <button type="button" 
+                class="btn" 
+                id="edit-${data.id}"
+                style="
+                    background-color: #FFE600;
+                    border: none;
+                    border-radius: 50%;
+                    width: 56px;
+                    height: 56px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0;
+                    box-shadow: none;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease;
+                ">
+            <img src="https://www.raiffeisen.ru/static/common/initial/fcc_icons/unlocked.svg" alt="edit" style="width: 32px; height: 32px;">
         </button>
       </div>
     `
 	}
 
-	addListeners(data, viewListener, removeListener) {
+	addListeners(data, viewListener, editListener, removeListener) {
 		const removeBtn = document.getElementById(`remove-${data.id}`);
 		const viewBtn = document.getElementById(`view-${data.id}`);
+		const editBtn = document.getElementById(`edit-${data.id}`);
 
-		// Эффект при наведении для кнопки "Удалить"
 		removeBtn.addEventListener('mouseenter', () => {
-			removeBtn.style.backgroundColor = '#D0C9C0'; // Темнее на 10%
+			removeBtn.style.backgroundColor = '#D0C9C0';
 		});
 		removeBtn.addEventListener('mouseleave', () => {
-			removeBtn.style.backgroundColor = '#E9E4DD'; // Возвращаем исходный
+			removeBtn.style.backgroundColor = '#E9E4DD';
 		});
 
-		// Эффект при наведении для кнопки "Просмотр"
 		viewBtn.addEventListener('mouseenter', () => {
-			viewBtn.style.backgroundColor = '#1C1F24'; // Темнее на 10%
+			viewBtn.style.backgroundColor = '#1C1F24';
 		});
 		viewBtn.addEventListener('mouseleave', () => {
-			viewBtn.style.backgroundColor = '#2B2D33'; // Возвращаем исходный
+			viewBtn.style.backgroundColor = '#2B2D33';
 		});
 
-		// Обработчики клика
+		editBtn.addEventListener('mouseenter', () => {
+			editBtn.style.backgroundColor = '#FFD600';
+		});
+		editBtn.addEventListener('mouseleave', () => {
+			editBtn.style.backgroundColor = '#FFE600';
+		});
+
 		removeBtn.addEventListener('click', removeListener);
 		viewBtn.addEventListener('click', viewListener);
+		editBtn.addEventListener('click', editListener);
 	}
 
-	render(data, analyzeListener, removeListener) {
+	render(data, viewListener, editListener, removeListener) {
 		const html = this.getHTML(data)
 		this.parent.insertAdjacentHTML('beforeend', html)
-		this.addListeners(data, analyzeListener, removeListener)
+		this.addListeners(data, viewListener, editListener, removeListener)
 	}
 }
